@@ -1,9 +1,7 @@
-wiz beurer govee sunlogin
-tplink wemo
-IMOU EZVIZ
-august
-netvue
-kevo
-meross
+/IoT-Logic/ Checker
 
-Delegation:kwikset,google home
+* Dependency
+maude v3.2.2
+
+* Checking
+maude checkers/XXX.maude
