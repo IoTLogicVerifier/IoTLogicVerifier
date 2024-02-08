@@ -1,0 +1,136 @@
+load ../cases/iRobot .
+load model-checker .
+mod PREDS is
+*** Threat Model
+*** restrication to approximate soundness
+pr TRANSITION * (sort State to State') .
+including SATISFACTION .
+***including LTL-SIMPLIFIER .
+pr BOOL-OPS .
+
+subsort Vertex < State .
+ops um um0 um1 um2 um3 um4 uer ubm : -> Prop .
+ops am am1 am2 am3 am4 am5 am6 ac al arm alm : -> Prop .
+ops attackerGain userGain : -> Prop .
+ops userAlert userBindFinished attackerLocal attackerRemote uBindBoundReached :  -> Prop .
+
+*** string manipulate
+***op _startswith_ : String String -> Bool .
+***eq S1 startswith S2 = find(S1 , S2 , 0) == 0 .
+
+var Vtx : Vertex .
+var P : Prop .
+var E : Event .
+vars K Status : Qid .
+var S : Soup .
+var N : Nat .
+vars ... : Set .
+
+***predicates of the previous applied rewiting rule
+**** generate from transition rules
+*** actions
+ceq E ==> S |= um0 = true if E = ua0 .
+ceq E ==> S |= um1 = true if E = ua1 .
+ceq E ==> S |= um2 = true if stripData(E) = stripData(ua2('')) .
+ceq E ==> S |= um3 = true if stripData(E) = stripData(ua3('')) .
+ceq E ==> S |= um4 = true if stripData(E) = stripData(ua4('')) .
+ceq E ==> S |= uer = true if stripData(E) = stripData(ua5('')) .
+ceq E ==> S |= um = true if subject(E) = userA . 
+ceq Vtx |= ubm = true if Vtx |= um /\ not (Vtx |= uer) . 
+
+ceq E ==> S |= am1 = true if E = uc1 .
+ceq E ==> S |= am2 = true if stripData(E) = stripData(uc2('')) . 
+ceq E ==> S |= am3 = true if E = uc3 .
+ceq E ==> S |= am4 = true if stripData(E) = stripData(uc4('')) .
+ceq E ==> S |= am5 = true if stripData(E) = stripData(uc5('')) .
+ceq E ==> S |= am6 = true if stripData(E) = stripData(uc6('')) .
+ceq Vtx |= arm = true if Vtx |= am5 or Vtx |= am6 or Vtx |= ac . 
+ceq Vtx |= alm = true if not (Vtx |= arm) . 
+eq $ userC 'approaches' deviceB ==> S |= ac = true .
+eq $ userC 'leaves' deviceB ==> S |= al = true .
+ceq E ==> S |= am = true if subject(E) = userC .
+
+*** Status
+eq E ==> S < userC | 'localTo' : deviceB , ... > |= attackerLocal = true .
+eq E ==> S < userC | 'localTo' : deviceD , ... > |= attackerRemote = true .
+ceq E ==> S < userA | 'bindStatus' : Status , ... >  |= userAlert = true if Status == 'hasOtherOwner' or Status == 'revoked' .
+eq  E ==> S < userA | 'bindStatus' : 'success' , ... >  |= userBindFinished = true .
+ceq E ==> S < userA | 'counter' : N , ... >  |= uBindBoundReached = true if N >= 2 . *** Max turns number, make sure this number < random space
+
+
+*** permission
+eq E ==> S < cloudA | deviceB : ( 'owner' : userC , ...) > |= attackerGain = true .
+eq E ==> S < cloudA | deviceB : ('owner' : userA , ...) > |= userGain = true .
+
+eq Vtx |= P = false [owise] .
+
+endm
+
+fmod ExtraLTL is
+extending LTL .
+pr SAT-SOLVER .
+*** extra LTL operator
+ops _xor_ : Formula Formula -> Formula [comm ctor gather (E e) prec 59 format (d r o d)] .
+vars f g h  : Formula .
+
+eq f xor g = (f /\ ~ g) \/ (g /\ ~ f) .
+
+
+endfm
+
+mod CHECK is
+pr PREDS .
+***pr ExtraLTL .
+including MODEL-CHECKER .
+
+ops stability safety fairness fairness1 fairness2 fairness3 userActSeqOnce : -> Prop .
+ops dos rob test spec : -> Prop .
+ops attackerSafe : -> Prop .
+
+sort PList . subsort Prop < PList .
+op _;_ : PList PList -> PList [ctor prec 66 id: nil gather (e E)] .
+op nil : -> PList [ctor] .
+
+op fairF1 : PList -> Prop .
+vars XS : PList .
+vars X Y : Prop .
+
+eq fairF1(nil) = True .
+eq fairF1( X ; nil ) = X .
+eq fairF1( um4 ; XS ) = um4 /\ O (~ ubm U uer \/ (fairF1(XS))) . ***um4 --> the end of user move
+eq fairF1( X ; XS ) = X /\ O ((~ ubm /\ ~ alm) U uer \/ (fairF1(XS))) [owise] .
+
+eq attackerSafe = [] (userAlert -> attackerRemote) .
+eq fairness3 = [](um0 -> O ((~ ubm /\ ~ alm) W uer \/ um1))
+            /\ [](um1 -> O ((~ ubm /\ ~ alm) W uer \/ um2))
+            /\ [](um2 -> O ((~ ubm /\ ~ alm) W uer \/ um3))
+            /\ [](um3 -> O ((~ ubm /\ ~ alm) W uer \/ um4))
+            /\ [](um4 -> O (~ ubm W uer \/ um0))
+            /\ [](uer -> O (~ ubm W um0))  
+            /\ [](userBindFinished -> O ~ um)
+            /\ <> um0 
+            /\ [] (~ uBindBoundReached) *** restrict the user bind times
+            /\ attackerSafe .
+
+*** this version : when interrupt with uer, user can start from any move in the binding sequence um1, um2, um3, um4
+eq fairness2 = []((fairF1(um0 ; um1 ; um2 ; um3 ; um4)
+               \/  fairF1(um1 ; um2 ; um3 ; um4 ; um0)
+               \/  fairF1(um2 ; um3 ; um4 ; um0 ; um1)
+               \/  fairF1(um3 ; um4 ; um0 ; um1 ; um2)
+               \/  fairF1(um4 ; um0 ; um1 ; um2 ; um3)
+               \/  ~ ubm ))
+              /\ [] (uer -> O (~ ubm U um0))  
+              /\ [] (userBindFinished -> O ~ um) 
+              /\ attackerSafe .
+
+
+eq dos = <> ((attackerRemote /\ userGain) /\ O (~ userGain /\ attackerRemote)) . *** OK! O ~ dos 
+eq rob = <> ((attackerRemote /\ ~ attackerGain) /\ O (attackerGain /\ attackerRemote))  . *** OK!
+*** thread model can be an LTL fairness property
+eq fairness = fairness3 . 
+eq safety = dos .
+eq spec = O ~ (safety /\ fairness) .
+***eq spec = O ~ fairness .
+endm
+
+load ../postProcess .

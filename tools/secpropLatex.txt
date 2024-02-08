@@ -1,0 +1,8 @@
+\square(ubm_0 \rightarrow \bigcirc ((\neg ubm \wedge \neg alm) \mathcal{U} uer \vee ubm_1))
+\wedge \square(ubm_1 \rightarrow \bigcirc ((\neg ubm \wedge \neg alm) \mathcal{U} uer \vee ubm_2))
+\wedge \square(ubm_2 \rightarrow \bigcirc ((\neg ubm \wedge \neg alm) \mathcal{U} uer \vee ubm_3))
+\wedge \square(ubm_3 \rightarrow \bigcirc ((\neg ubm \wedge \neg alm) \mathcal{U} uer \vee ubm_4))
+\wedge \square(ubm_4 \rightarrow \bigcirc (\neg ubm \mathcal{U} uer \vee ubm_0))
+\wedge \square(uer \rightarrow \bigcirc (\neg ubm \mathcal{U} ubm_0))  
+\wedge \square(userPleased \rightarrow \bigcirc \neg um) 
+\wedge \square(userAlert \rightarrow attackerRemote)
