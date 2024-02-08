@@ -1,7 +1,9 @@
 IoT-Logic Checker
 
-* Dependency
+* Dependency:
+
 maude v3.2.2
 
-* Checking
-maude checkers/XXX.maude
+* Checking:
+
+> maude checkers/XXX.maude
