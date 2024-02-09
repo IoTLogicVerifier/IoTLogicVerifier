@@ -67,6 +67,7 @@ eq decrypt(Key , encrypt(Key , Secret) )  = Secret .
 op subject : Event -> Principal .
 op object  : Event -> Principal .
 op stripData : Event -> Event .
+op getState : Vertex -> Soup . 
 eq subject($ PrincipalX Act PrincipalY) = PrincipalX .
 eq subject($ PrincipalX Act PrincipalY | .... ) = PrincipalX .
 eq object($ PrincipalX Act PrincipalY) = PrincipalY .
@@ -75,5 +76,6 @@ eq object($ PrincipalX Act PrincipalY | .... ) = PrincipalY .
 eq stripData($ PrincipalX Act PrincipalY | ....) = $ PrincipalX Act PrincipalY .
 eq stripData( E ) = E [owise] . 
 
+eq getState(E ==> S) = S .
 endfm
 

@@ -1,7 +1,6 @@
 load ../Iot .
 mod SYSTEM is
 protecting Iot .
-***in fact,ticket generate by cloud. device does not hold the ticket.
 eq init = idle ==> < cloudA | deviceB : ('owner' : nils , 'key' : 'secretOfB') > 
             < deviceB | 'key' : 'secretOfB' > 
             < cloudA | userA : ('device' : nils , 'member' : nils) >

@@ -1,7 +1,6 @@
 load ../Iot .
 mod SYSTEM is
 pr Iot .
-***$3: Analyzer input:inital state 
 eq init = idle ==> < cloudA | deviceB , 'owner' : false > 
             < cloudA | deviceD , 'owner' : false   >
             < cloudA | userA , 'bdKey' : 'SecretOfA' >
