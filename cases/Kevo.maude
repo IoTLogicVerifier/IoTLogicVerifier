@@ -1,9 +1,8 @@
 load ../Iot .
 mod SYSTEM is
 protecting Iot .
-***in fact,ticket generate by cloud. device does not hold the ticket.
 eq init = idle ==> < cloudA | deviceB : ('owner' : nils , 'key' : 'secretOfB') > 
-            < deviceB | 'key' : 'secretOfB' , 'counter' : 0 > 
+            < deviceB | 'key' : pub('secretOfB') , 'counter' : 0 > 
             < userC | 'localTo' : deviceD , 'know' : nils >
             < userA | 'localTo' : deviceB , 'know' : nils , 'bindStatus' : 'ready' , 'counter' : 0 > .
 
@@ -23,7 +22,7 @@ eq  < DeviceX | 'key' : KeyA, 'counter' : N > < UserX | 'localTo' : DeviceX , ..
 
 ***cloud rule
 eq < cloudA | DeviceX : ('owner' : SetX  , 'key' : KeyA) >
-   $ UserX 'callAPI:bind' cloudA | (DeviceX ; encrypt(KeyA , R)) 
+   $ UserX 'callAPI:bind' cloudA | (DeviceX ; encrypt(pub(KeyA) , R)) 
  = < cloudA | DeviceX : ('owner' : UserX , 'key' : KeyA) > 
    $ cloudA 'respAPI:bind' UserX | true .
 

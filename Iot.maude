@@ -31,6 +31,7 @@ op $_ _ _ | _ : Principal Action Principal Arguments -> Event [ctor prec 15] .
 op randomStr : Nat -> Qid .
 op encrypt : Qid Qid -> Qid .
 op decrypt : Qid Qid -> Qid .
+op pub : Qid -> Qid .
 
 ***Some Primitives
 op cloudA : -> Cloud [ctor] .
@@ -61,7 +62,8 @@ eq E ==> S E' = E ==> S [owise] . ***remove events in every end of turn
 
 eq randomStr(N) = qid("key" + string(float(N))) .
 
-eq decrypt(Key , encrypt(Key , Secret) )  = Secret .
+eq decrypt(Key , encrypt(pub(Key) , Secret) )  = Secret .
+eq decrypt(pub(Key) , encrypt(Key , Secret) )  = Secret .
 
 *** Aux for chekcer,  defined operator , getter setter 
 op subject : Event -> Principal .
