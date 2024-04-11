@@ -7,7 +7,7 @@ pr BOOL-OPS .
 
 subsort Vertex < State .
 ops um um1 um2 : -> Prop .
-ops admission lockOn :  -> Prop .
+ops permission deviceOn :  -> Prop .
 
 var Vtx : Vertex .
 var P : Prop .
@@ -24,9 +24,9 @@ ceq E ==> S |= um2 = true if E = ua2 .
 ceq Vtx |= um = true if (Vtx |= um1) or (Vtx |= um2) .
 
 *** status
-eq E ==> S < googleHome | switch : ('trust' : (userC,SetX) , ...) > |= admission = true .
+eq E ==> S < googleHome | switch : ('trust' : (userC,SetX) , ...) > |= permission = true .
 *** access control
-eq E ==> S < lock | 'onoff' : true , ... > |= lockOn = true .
+eq E ==> S < lock | 'onoff' : true , ... > |= deviceOn = true .
 
 eq Vtx |= P = false [owise] .
 
@@ -39,8 +39,8 @@ including MODEL-CHECKER .
 ops danger fairness : -> Prop .
 ops spec : -> Prop .
 
-eq danger = <> (((~ admission) /\ O (~ admission)) /\ ((~ lockOn /\ O lockOn) \/ (lockOn /\ O (~ lockOn)))) .
-eq fairness = []((um1 -> O (~ um U um2))
+eq danger = <> (((~ permission) /\ O (~ permission)) /\ ((~ deviceOn /\ O deviceOn) \/ (deviceOn /\ O (~ deviceOn)))) .
+eq fairness = []((um1 -> O (~ um W um2))
               /\ (um2 -> O ([] ~ um)))
               /\ <> um1 .
 

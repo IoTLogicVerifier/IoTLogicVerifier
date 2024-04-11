@@ -17,6 +17,8 @@ op _;_ : List List -> List[ctor prec 41 id: nil gather(e E)]
 op _in_ : Item Set -> Bool [prec 41] .
 op _in_ : Item List -> Bool [prec 41] .
 
+op list : List -> Item .
+
 vars X Y : Item .
 vars S : Set .
 vars L L' : List .

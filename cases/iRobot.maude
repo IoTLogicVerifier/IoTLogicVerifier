@@ -13,9 +13,7 @@ vars UserX UserY : User .
 vars DeviceX : Device .
 vars KeyA KeyB Status : Qid .
 vars ...  ....  : Set .
-vars S : Soup .
-vars Any Any' : Bool .
-vars N : Nat .
+vars Any : Bool .
 
 ***device rule
 eq  < DeviceX | 'pressed' : false , ... > < UserX | 'localTo' : DeviceX , .... >  $ UserX 'pressButton' DeviceX 

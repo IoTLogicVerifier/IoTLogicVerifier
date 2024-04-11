@@ -4,8 +4,8 @@ protecting Iot .
 eq init = idle ==> < cloudA | deviceB : ('trust' : userA ) > 
             < cloudA | 'key' : 'cloudAPrivKey' >
             < deviceB | 'key' : '' , 'counter' : 0 , 'trust' : userA > 
-            < userC | 'localTo' : deviceD , 'know' : nils >
-            < userA | 'localTo' : deviceB , 'know' : nils > .
+            < userC | 'localTo' : deviceD , 'signedKey' : nils, 'key' : nils >
+            < userA | 'localTo' : deviceB , 'signedKey' : nils, 'key' : nils > .
 
 vars UserX UserY : User .
 vars KeyA KeyB Status R : Qid .
@@ -19,7 +19,7 @@ vars N N' : Nat .
 eq  < DeviceX | 'key' : KeyA, 'counter' : N, ... > < UserX | 'localTo' : DeviceX , .... >
     $ UserX 'callAPI:getKey' DeviceX 
   = < DeviceX | 'key' : randomStr(N), 'counter' : (N + 1) rem 10 , ... > < UserX | 'localTo' : DeviceX , .... >
-    $ DeviceX 'transfer' UserX | randomStr(N) . 
+    $ DeviceX 'respAPI:getKey' UserX | randomStr(N) . 
 
 eq < DeviceX | 'key' : KeyA, 'counter' : N , 'trust' : SetX > < UserX | 'localTo' : DeviceX , .... >
     $ UserX 'callAPI:bind' DeviceX | encrypt('cloudAPrivKey' , KeyA)
@@ -39,6 +39,10 @@ eq < cloudA | DeviceX : ('trust' : (UserY,UserX,SetX) ) >
    $ UserX 'callAPI:revoke' cloudA | (UserY ; DeviceX)
  = < cloudA | DeviceX : ('trust' : (UserX,SetX) ) > .
 
+eq < UserX | 'key' : SetX, ... > $ DeviceX 'respAPI:getKey' UserX | KeyA
+ = < UserX | 'key' : (KeyA ,SetX), ... > .
+eq < UserX | 'signedKey' : SetX, ... > $ cloudA 'respAPI:signKey' UserX | KeyB
+ = < UserX | 'signedKey' : (KeyB ,SetX), ... > .
 endm
 
 mod TRANSITION is
@@ -70,12 +74,12 @@ rl [am1] :
  => uc1 ==> S < userC | 'localTo' : deviceB , ... > uc1 .
 
 rl [am2] : 
-     E      ==> S < userC | 'know' : (K , Keys) , ... > 
-  => uc2(K) ==> S < userC | 'know' : (K , Keys) , ... > uc2(K) .
+     E      ==> S < userC | 'key' : (K , Keys) , ... > 
+  => uc2(K) ==> S < userC | 'key' : (K , Keys) , ... > uc2(K) .
 
 rl [am3] : 
-     E      ==> S < userC | 'localTo' : deviceB , 'know' : (K , Keys) , ... > 
-  => uc3(K) ==> S < userC | 'localTo' : deviceB , 'know' : (K , Keys) , ... > uc3(K) .
+     E      ==> S < userC | 'localTo' : deviceB , 'signedKey' : (K , Keys) , ... > 
+  => uc3(K) ==> S < userC | 'localTo' : deviceB , 'signedKey' : (K , Keys) , ... > uc3(K) .
 
 
 rl [ac] : E ==> S < userC | 'localTo' : deviceD , ... > 

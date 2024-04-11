@@ -1,4 +1,4 @@
-load ../cases/MaagKwikset .
+load ../cases/MaagLevel .
 load model-checker .
 mod PREDS is
 pr TRANSITION * (sort State to State') .
@@ -27,8 +27,7 @@ ceq Vtx |= um = true if (Vtx |= um1) or (Vtx |= um2) .
 eq E ==> S < cloudA | deviceB : ('trust' : (userC,SetX) , ...) > |= permission = true .
 
 *** actual permission
-eq E ==> S < deviceB | 'trust' : (userC,SetX) , ... > |= attackerWin = true .
-ceq E ==> S < deviceB | 'counter' : N , ... >  |= boundReached = true if N >= 5 . 
+eq E ==> S < deviceB | 'accessControl' : ('trust' : (userC,SetX) , ...) > |= attackerWin = true .
 eq Vtx |= P = false [owise] .
 
 endm
@@ -39,6 +38,7 @@ including MODEL-CHECKER .
 
 ops danger fairness : -> Prop .
 ops spec : -> Prop .
+
 
 eq danger = <> ((~ permission /\ ~ attackerWin) /\ O (~ permission /\ attackerWin)) .
 eq fairness = []((um1 -> O (~ um W um2))
