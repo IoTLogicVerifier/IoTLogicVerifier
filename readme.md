@@ -4,7 +4,7 @@ IoT-Logic Verifier (L-Verifier)
 
 maude v3.2.2
 
-Patche standard prelude madue library
+Patch standard prelude madue library
 > cp preludePatched.maude /usr/share/maude/prelude.maude
 
 * Checking:
