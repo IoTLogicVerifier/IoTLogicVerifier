@@ -1,0 +1,50 @@
+load ../../cases/INT/delegationFlaw1 .
+load model-checker .
+mod PREDS is
+pr TRANSITION * (sort State to State') .
+including SATISFACTION .
+pr BOOL-OPS .
+
+subsort Vertex < State .
+ops um um1 um2 : -> Prop .
+ops permission deviceOn :  -> Prop .
+
+var Vtx : Vertex .
+var P : Prop .
+var E : Event .
+vars K Status : Qid .
+var S : Soup .
+var N : Nat .
+var D : Device .
+vars SetX ... : Set .
+
+*** actions
+ceq E ==> S |= um1 = true if E = ua1 .
+ceq E ==> S |= um2 = true if E = ua2 .
+ceq Vtx |= um = true if (Vtx |= um1) or (Vtx |= um2) .
+
+*** status
+eq E ==> S < googleHome | switch : ('trust' : (userC,SetX) , ...) > |= permission = true .
+*** access control
+eq E ==> S < lock | 'onoff' : true , ... > |= deviceOn = true .
+
+eq Vtx |= P = false [owise] .
+
+endm
+
+mod CHECK is
+pr PREDS .
+including MODEL-CHECKER .
+
+ops danger fairness : -> Prop .
+ops spec : -> Prop .
+
+eq danger = <> (((~ permission) /\ O (~ permission)) /\ ((~ deviceOn /\ O deviceOn) \/ (deviceOn /\ O (~ deviceOn)))) .
+eq fairness = []((um1 -> O (~ um W um2))
+              /\ (um2 -> O ([] ~ um)))
+              /\ <> um1 .
+
+eq spec = O ~ (danger /\ fairness) .
+endm
+
+load ../../postProcess .

@@ -9,4 +9,4 @@ Patch standard prelude madue library
 
 * Checking:
 
-> maude checkers/XXX.maude
+> maude checkers/XXX/XXXX.maude

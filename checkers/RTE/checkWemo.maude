@@ -1,0 +1,82 @@
+load ../../cases/RTE/Wemo .
+load model-checker .
+mod PREDS is
+pr TRANSITION * (sort State to State') .
+including SATISFACTION .
+pr BOOL-OPS .
+
+subsort Vertex < State .
+ops um um1 um2 uer ubm : -> Prop .
+ops am aDbm ac al arm alm : -> Prop .
+ops attackerGain userGain maliciousDevice : -> Prop .
+ops userAlert userBindFinished attackerLocal attackerRemote uBindBoundReached :  -> Prop .
+
+var Vtx : Vertex .
+var P : Prop .
+var E : Event .
+vars K Status : Qid .
+var S : Soup .
+var N : Nat .
+var D : Device .
+vars ... : Set .
+
+*** actions
+ceq E ==> S |= um1 = true if E = ua1 .
+ceq E ==> S |= um2 = true if E = ua2 .
+ceq E ==> S |= um = true if subject(E) = userA . 
+eq Vtx |= uer = false .
+ceq Vtx |= ubm = true if Vtx |= um /\ not (Vtx |= uer) . 
+
+ceq E ==> S |= aDbm = true if subject(E) = userC /\ object(E) = deviceB .
+ceq Vtx |= alm = true if Vtx |= attackerLocal /\ Vtx |= aDbm . 
+
+eq $ userC 'approaches' deviceB ==> S |= ac = true .
+eq $ userC 'leaves' deviceB ==> S |= al = true .
+ceq E ==> S |= am = true if subject(E) = userC .
+
+*** Status
+eq E ==> S < userC | 'localTo' : deviceB , ... > |= attackerLocal = true .
+eq E ==> S < userC | 'localTo' : deviceD , ... >  |= attackerRemote = true .
+eq E ==> S < userA | 'bindStatus' : 'revoked' , ... >  |= userAlert  = true .
+eq E ==> S < userA | 'bindStatus' : 'success' , ... >  |= userBindFinished = true .
+ceq E ==> S < userA | 'counter' : N , ... >  |= uBindBoundReached = true if N >= 5 . *** Max turns number, make sure this number < random space
+
+*** permission
+eq E ==> S < cloudA | deviceB , 'owner' : userC , ... > |= attackerGain = true .
+eq E ==> S < cloudA | deviceB , 'owner' : userA , ... > |= userGain = true .
+eq E ==> S < cloudA | deviceD , 'owner' : userA , ... > |= maliciousDevice = true .
+
+eq Vtx |= P = false [owise] .
+
+endm
+
+mod CHECK is
+pr PREDS .
+***pr ExtraLTL .
+including MODEL-CHECKER .
+
+ops danger safety fairness fairness1 fairness2 fairness3 userActSeqOnce : -> Prop .
+ops dos rob md test spec : -> Prop .
+ops attackerSafe : -> Prop .
+
+eq attackerSafe = [] (userAlert -> attackerRemote) .
+eq fairness3 = [](um1 -> O (~ ubm W um2))
+            /\ [](um2 -> O (~ ubm W um1))
+            /\ [](uer -> O (~ ubm U um1))  *** uer : [] false
+            /\ [](userBindFinished -> O ~ um)
+            /\ <> um1 
+            /\ [] (~ uBindBoundReached) *** restrict the user bind times
+            .
+
+eq dos = <> (userGain /\ O (~ userGain)) .  
+eq rob = <> (~ attackerGain /\ O attackerGain) . 
+eq md = <> maliciousDevice .
+*** thread model can be an LTL fairness property
+eq fairness = fairness3 . 
+eq danger = rob . *** or rob or dos
+eq spec = O ~ (danger /\ fairness) .
+***eq spec = O ~ (fairness /\ <> attackerGain) .
+***eq spec = O [] ~ maliciousDevice .
+endm
+
+load ../../postProcess .
