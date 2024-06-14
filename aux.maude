@@ -8,6 +8,7 @@ subsort Item < List .
 subsort Qid < Key .
 ***op _:_ : Qid Set -> Pair [ctor prec 40 gather (e E)] .
 op _:_ : Key Set -> Pair [ctor prec 40 gather (e E)] .
+op _++_ : List Set -> Set [ctor prec 39 gather (e E)] .
 
 op nil : -> List [ctor] .
 op nils : -> Set [ctor] .
@@ -31,4 +32,7 @@ eq X , X = X  . *** idem for efficiency
 eq X in nil = false .
 eq X in (X ; L) = true .
 eq X in (Y ; L) = X in L .
+
+eq nil ++ S = S .
+eq (X ; L) ++ S = L ++ (X , S) .
 endfm

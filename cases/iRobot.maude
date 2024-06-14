@@ -101,51 +101,51 @@ eq uc6(K) = $ userC 'callAPI:reset' cloudA | (deviceB ; K) .
 *** userA operation rl rule, generate from $1
 *** unconditional generating
 crl [um0] : 
-     E   ==> S < userA | 'bindStatus' : Status , 'bdKey' : K , 'counter' : N , ... > 
-  => ua0 ==> S < userA | 'bindStatus' : 'progress' , 'bdKey' : randomStr(N) , 'counter' : (N + 1) rem 10 , ... > ua0 
-  if Status == 'revoked' or Status == 'ready' . 
-rl [um1] : E ==> S  => ua1 ==> S ua1  .
+       E   ==> S < userA | 'bindStatus' : Status , 'bdKey' : K , 'counter' : N , ... > 
+=> ep: ua0 ==> S < userA | 'bindStatus' : 'progress' , 'bdKey' : randomStr(N) , 'counter' : (N + 1) rem 10 , ... >
+   if Status == 'revoked' or Status == 'ready' . 
+rl [um1] : E ==> S  => ep: ua1 ==> S .
 crl [um2] : 
-    E      ==> S < userA | 'bdKey' : K , 'bindStatus' : 'progress' , ... > 
- => ua2(K) ==> S < userA | 'bdKey' : K , 'bindStatus' : 'progress' , ... > ua2(K) if K =/= '' .
+        E      ==> S < userA | 'bdKey' : K , 'bindStatus' : 'progress' , ... > 
+ => ep: ua2(K) ==> S < userA | 'bdKey' : K , 'bindStatus' : 'progress' , ... > if K =/= '' .
 crl [um3] : 
-    E      ==> S < userA | 'bdKey' : K , 'bindStatus' : 'progress' , ... >
- => ua3(K) ==> S < userA | 'bdKey' : K , 'bindStatus' : 'progress' , ... > ua3(K) if K =/= '' .
+        E      ==> S < userA | 'bdKey' : K , 'bindStatus' : 'progress' , ... >
+ => ep: ua3(K) ==> S < userA | 'bdKey' : K , 'bindStatus' : 'progress' , ... > if K =/= '' .
 crl [um4] : 
-      E    ==> S < userA | 'bdKey' : K , 'bindStatus' : 'progress' , ... >
- => ua4(K) ==> S < userA | 'bdKey' : K , 'bindStatus' : 'progress' , ... > ua4(K) if K =/= '' .
+          E    ==> S < userA | 'bdKey' : K , 'bindStatus' : 'progress' , ... >
+ => ep: ua4(K) ==> S < userA | 'bdKey' : K , 'bindStatus' : 'progress' , ... > if K =/= '' .
 
 crl [uer] : 
-      E    ==> S < userA | 'bdKey' : K , 'bindStatus' : 'hasOtherOwner' , ... >  
- => ua5(K) ==> S < userA | 'bdKey' : K , 'bindStatus' : 'hasOtherOwner' , ... > ua5(K)
+          E    ==> S < userA | 'bdKey' : K , 'bindStatus' : 'hasOtherOwner' , ... >  
+ => ep: ua5(K) ==> S < userA | 'bdKey' : K , 'bindStatus' : 'hasOtherOwner' , ... >
  if K =/= '' .
 
 *** userC operations rl rule, generate heuristicly from $2.
 **** these rule for generating actions has premises, that is a place to prune(prefer) or authenticate  .
 rl [am1] : 
-      E ==> S < userC | 'localTo' : deviceB , ... > 
- => uc1 ==> S < userC | 'localTo' : deviceB , ... > uc1 .
+          E ==> S < userC | 'localTo' : deviceB , ... > 
+ => ep: uc1 ==> S < userC | 'localTo' : deviceB , ... > .
 
 rl [am2] : 
-     E      ==> S < userC | 'localTo' : deviceB , 'know' : (K , Keys) , ... > 
- =>  uc2(K) ==> S < userC | 'localTo' : deviceB , 'know' : (K , Keys) , ... > uc2(K) .
+        E      ==> S < userC | 'localTo' : deviceB , 'know' : (K , Keys) , ... > 
+ => ep: uc2(K) ==> S < userC | 'localTo' : deviceB , 'know' : (K , Keys) , ... > .
 
 crl [am3] : 
-     E    ==> S < userC | 'localTo' : deviceB , ... > < deviceB | 'bdKey' : K , 'pressed' : true , .... > 
- =>  uc3  ==> S < userC | 'localTo' : deviceB , ... > < deviceB | 'bdKey' : K , 'pressed' : true , .... > uc3 
+       E    ==> S < userC | 'localTo' : deviceB , ... > < deviceB | 'bdKey' : K , 'pressed' : true , .... > 
+=> ep: uc3  ==> S < userC | 'localTo' : deviceB , ... > < deviceB | 'bdKey' : K , 'pressed' : true , .... >
      if K =/= '' .
 
 rl [am4] : 
-     E      ==> S < userC | 'localTo' : deviceB , 'know' : (K , Keys) , ... > 
-  => uc4(K) ==> S < userC | 'localTo' : deviceB , 'know' : (K , Keys) , ... > uc4(K) .
+        E      ==> S < userC | 'localTo' : deviceB , 'know' : (K , Keys) , ... > 
+ => ep: uc4(K) ==> S < userC | 'localTo' : deviceB , 'know' : (K , Keys) , ... > .
 
 rl [am5] : 
-    E      ==> S < userC | 'know' : (K , Keys) , ... > 
- => uc5(K) ==> S < userC | 'know' : (K , Keys) , ... > uc5(K) .
+        E      ==> S < userC | 'know' : (K , Keys) , ... > 
+ => ep: uc5(K) ==> S < userC | 'know' : (K , Keys) , ... >  .
 
 rl [am6] : 
-    E      ==> S < userC | 'know' : (K , Keys) , ... > 
- => uc6(K) ==> S < userC | 'know' : (K , Keys) , ... > uc6(K) .
+        E      ==> S < userC | 'know' : (K , Keys) , ... > 
+ => ep: uc6(K) ==> S < userC | 'know' : (K , Keys) , ... > .
 
 rl [ac] : E ==> S < userC | 'localTo' : deviceD , ... > 
    => $ userC 'approaches' deviceB ==> S < userC | 'localTo' : deviceB , ... >  .

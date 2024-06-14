@@ -3,7 +3,7 @@ load aux .
 fmod Iot is
 pr Container .
 pr CONVERSION .
-sorts Principal Action Attributes Arguments Event State Soup Vertex .
+sorts Principal Action Attributes Arguments Event State Soup Vertex Progress .
 sorts User Device Cloud .
 subsort User Device Cloud < Principal .
 subsort Principal Qid Nat Bool < Item .
@@ -16,6 +16,7 @@ subsort State Event < Soup .
 *** trace the operations sequance
 *** so we can restrict to some transitions according to action trace .
 op _==>_ : Event Soup -> Vertex [ctor prec 41 format (y g! bn o)] . ***leading to
+op ep:_ : Vertex -> Vertex [ctor prec 50] . ***ephemeral
 op __ : Soup Soup -> Soup [ctor prec 41 assoc comm id: null] .  
 op null : -> Soup [ctor] .
 op init : -> Vertex .
@@ -58,7 +59,10 @@ vars St : State .
 vars N : Nat .
 
 eq St St  = St . ***every state is unique
+
+eq ep: E ==> S = E ==> S E .
 eq E ==> S E' = E ==> S [owise] . ***remove events in every end of turn
+
 
 eq randomStr(N) = qid("key" + string(float(N))) .
 
@@ -80,4 +84,3 @@ eq stripData( E ) = E [owise] .
 
 eq getState(E ==> S) = S .
 endfm
-

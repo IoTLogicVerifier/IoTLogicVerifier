@@ -62,15 +62,15 @@ eq uc1 = $ userC 'callAPI:openWindow' cloudA | deviceB .
 eq uc2(K) = $ userC 'callAPI:bind' deviceB | K .
 eq uc3 = $ userC 'toggle' deviceB .
 
-rl [um1] : E ==> S => ua1 ==> S ua1 .
+rl [um1] : E ==> S => ep: ua1 ==> S .
 
-rl [um2] : E ==> S  => ua2 ==> S ua2 .
+rl [um2] : E ==> S  => ep: ua2 ==> S .
 
-rl [am1] : E ==> S => uc1 ==> S uc1 .
+rl [am1] : E ==> S => ep: uc1 ==> S .
 
 rl [am2] : 
-     E      ==> S < userC | 'know' : (K , Keys) , ... > 
-  => uc2(K) ==> S < userC | 'know' : (K , Keys) , ... > uc2(K) .
+        E      ==> S < userC | 'know' : (K , Keys) , ... > 
+ => ep: uc2(K) ==> S < userC | 'know' : (K , Keys) , ... > .
 
-rl [am3] : E ==> S => uc3 ==> S uc3 .
+rl [am3] : E ==> S => ep: uc3 ==> S .
 endm
