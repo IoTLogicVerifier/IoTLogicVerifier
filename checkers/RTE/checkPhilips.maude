@@ -13,6 +13,7 @@ ops um um1 um2 um3 uer ubm : -> Prop .
 ops am am1 am2 am3 am4 aDbm ac al arm alm : -> Prop .
 ops attackerGain userGain maliciousDevice : -> Prop .
 ops userAlert userBindFinished attackerLocal attackerRemote uBindBoundReached :  -> Prop .
+ops pseudoRandomInit : -> Prop .
 
 var Vtx : Vertex .
 var P : Prop .
@@ -51,7 +52,9 @@ eq E ==> S < userC | 'localTo' : deviceD , ... >  |= attackerRemote = true .
 eq E ==> S < userA | 'bindStatus' : 'revoked' , ... >  |= userAlert  = true .
 eq E ==> S < userA | 'bindStatus' : 'success' , ... >  |= userBindFinished = true .
 ceq E ==> S < userA | 'counter' : N , ... >  |= uBindBoundReached = true if N >= 2 . *** Max number of turns, make sure this number < random space
-ceq E ==> S < cloudA | 'time' : N  >  |= uBindBoundReached = true if N >= 6 . *** Max number of times
+ceq E ==> S < cloudA | 'time' : N  >  |= uBindBoundReached = true if N >= 2 . *** Max number of times
+
+eq E ==> S < deviceB | 'counter' : 0 , ... > |= pseudoRandomInit = true .
 
 *** permission
 eq E ==> S < cloudA | deviceB : ('owner' : (userC , ....) , ...) > |= attackerGain = true .
@@ -69,9 +72,11 @@ inc MODEL-CHECKER .
 
 ops danger safety fairness fairness3 : -> Prop .
 ops dos rob md test spec : -> Prop .
-ops attackerSafe : -> Prop .
+ops attackerSafe unRepeated pseudoRandomLimit : -> Prop .
 ****TODO: restrict max number of things in one time 
 eq attackerSafe = [] (userAlert -> attackerRemote) .
+eq unRepeated = [] ((um1 -> O (~ um1)) /\ (am1 -> O (~ am1))) .
+eq pseudoRandomLimit = <> ((~ pseudoRandomInit) -> O ([] ~ pseudoRandomInit)) . 
 eq fairness3 = [](um1 -> O ((~ ubm /\ ~ alm) W um2))
             /\ [](um2 -> O ((~ ubm /\ ~ alm) W um3))
             /\ [](um3 -> O (~ ubm W um1))
@@ -79,7 +84,7 @@ eq fairness3 = [](um1 -> O ((~ ubm /\ ~ alm) W um2))
             /\ [](userBindFinished -> O ~ um)
             /\ <> um1 
             /\ [] (~ uBindBoundReached) *** restrict the bound
-            /\ attackerSafe .
+            /\ attackerSafe /\ unRepeated /\ pseudoRandomLimit .
 
 eq dos = <> ((attackerRemote /\ userGain) /\ O (~ userGain /\ attackerRemote)) .  
 eq rob = <> ((attackerRemote /\ ~ attackerGain) /\ O (attackerGain /\ attackerRemote)) . 
