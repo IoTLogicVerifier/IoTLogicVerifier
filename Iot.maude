@@ -3,6 +3,7 @@ load aux .
 fmod Iot is
 pr Container .
 pr CONVERSION .
+pr RANDOM .
 sorts Principal Action Attributes Arguments Event State Soup Vertex Progress .
 sorts User Device Cloud .
 subsort User Device Cloud < Principal .
@@ -64,7 +65,11 @@ eq ep: E ==> S = E ==> S E .
 eq E ==> S E' = E ==> S [owise] . ***remove events in every end of turn
 
 
-eq randomStr(N) = qid("key" + string(float(N))) .
+***eq randomStr(N) = qid("key" + string(float(N))) .
+op fc : String -> String .
+vars Str : String . 
+eq fc(Str) = substr(Str , 0 , 1) + substr(Str , 2 , 9) .
+eq randomStr(N) = qid("key" + fc(string(float(random(N))))) .
 
 eq decrypt(Key , encrypt(pub(Key) , Secret) )  = Secret .
 eq decrypt(pub(Key) , encrypt(Key , Secret) )  = Secret .
